@@ -122,9 +122,15 @@
   <div class="logo">Luxury Cars</div>
   <ul>
     <li><a href="/">Domov</a></li>
-    <li><a href="models">Modeli</a></li>
-    <li><a href="contact">Kontakt</a></li>
-    <li><a href="gallery">Galerija</a></li>
+    <li><a href="/about">O nas</a></li>
+    <li><a href="/models">Modeli</a></li>
+    <li><a href="/gallery">Galerija</a></li>
+    <li><a href="/contact">Kontakt</a></li>
+
+    {% if admin %}
+      <li><a href="/admin">Admin panel</a></li>
+    {% endif %}
+
     {% if not user %}
       <li><a href="/login">Prijava</a></li>
       <li><a href="/register">Registracija</a></li>
@@ -132,11 +138,9 @@
       <li class="user-info"><a href="/profile">Pozdravljen(a), <strong>{{ user }}</strong></a></li>
       <li><a href="/logout">Odjava</a></li>
     {% endif %}
-
-
-    
   </ul>
 </nav>
+
 
 <main>
 
