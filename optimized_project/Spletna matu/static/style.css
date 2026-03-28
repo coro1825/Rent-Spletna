@@ -1,0 +1,703 @@
+/* ===================== GLOBAL ===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+  color: #111;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ===================== NAV ===================== */
+.nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 20px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.nav ul {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+}
+
+.nav li a {
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.nav li a:hover {
+  color: #e10600;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  color: #e10600;
+}
+
+/* ===================== MAIN / SECTIONS ===================== */
+main {
+  margin-top: 90px;
+}
+
+.section {
+  min-height: calc(100vh - 90px);
+  padding: 80px 50px;
+}
+
+/* ===== HERO NADGRADNJA ===== */
+
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* slika */
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* temen overlay (luxury feel) */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.85));
+}
+
+/* content */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  animation: fadeIn 1s ease;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+/* CTA spodaj */
+.hero-cta {
+  position: absolute;
+  bottom: 60px;
+  z-index: 2;
+}
+
+/* gumb */
+.hero-cta button {
+  padding: 18px 45px;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e10600, #8f0000);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.hero-cta button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 15px 40px rgba(225,6,0,0.5);
+}
+
+/* animacija */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== HIGH-END FILTER BAR ===== */
+.filters {
+  display: flex;
+  gap: 20px;
+  margin: 40px 0;
+  padding: 25px 30px;
+  background: linear-gradient(135deg, #ffffff, #f2f2f2);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filters select {
+  appearance: none;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.filters select:hover {
+  border-color: #e10600;
+}
+
+.filters select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(225,6,0,0.15);
+}
+
+.filters button {
+  padding: 14px 26px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e10600, #9e0400);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.filters button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(225,6,0,0.4);
+}
+
+.filter-title {
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+
+/* ===================== CARS ===================== */
+.cars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.car {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+
+.car img {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: 180px !important;
+  width: 100% !important;
+  object-fit: cover;
+}
+
+.car:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+
+.car h3 {
+  margin-bottom: 10px;
+  color: #b30000;
+}
+
+.car p {
+  font-size: 0.95rem;
+}
+
+.car button {
+  margin-top: 15px;
+  background: #b30000;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.car button:hover {
+  background: #8f0000;
+}
+
+.car-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.car-gallery img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  transition: transform 0.3s ease;
+}
+
+.car-gallery img:hover {
+  transform: scale(1.05);
+}
+
+/* ===================== GALLERY ===================== */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+
+.gallery-img:hover {
+  transform: scale(1.05);
+}
+
+/* ===================== FORM ===================== */
+form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input, textarea {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+form button {
+  background: #e10600;
+  color: white;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+form button:hover {
+  background: #b80400;
+}
+
+/* ===================== MODAL ===================== */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.popup-content h2 {
+  color: #e10600;
+  margin-bottom: 15px;
+}
+
+.popup-content button {
+  margin-top: 15px;
+  background-color: #e10600;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background-color: #b80400;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width: 768px) {
+  .nav {
+    padding: 15px 20px;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+  }
+
+  .section {
+    padding: 60px 20px;
+  }
+}
+
+/* ===================== CAR DETAIL PAGE ===================== */
+
+.car-detail {
+  background: #f5f5f5;
+}
+
+.car-detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* LEVA STRAN */
+.car-detail-img {
+  width: 100%;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.car-detail h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #b30000;
+}
+
+.car-desc {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* SPECIFIKACIJE */
+.spec-list,
+.extras-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 30px;
+}
+
+.spec-list li,
+.extras-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+}
+
+.spec-list li strong {
+  color: #111;
+}
+
+/* DESNA STRAN – REZERVACIJA */
+.reservation-box {
+  position: sticky;
+  top: 120px;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.reservation-box h3 {
+  margin-bottom: 20px;
+  color: #b30000;
+  text-align: center;
+}
+
+.reservation-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reservation-box input,
+.reservation-box textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.reservation-box textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.reservation-box button {
+  margin-top: 10px;
+  background: #e10600;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.reservation-box button:hover {
+  background: #b80400;
+}
+
+#formStatus {
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: green;
+  text-align: center;
+}
+
+/* ===================== RESPONSIVE CAR DETAIL ===================== */
+@media(max-width: 900px) {
+  .car-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-box {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* ===== FILTER ANIMACIJE ===== */
+.car {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* LIGHTBOX */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 9999;
+}
+
+.lightbox.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox img {
+  width: 100vw;       
+  height: 100vh;    
+  object-fit: contain; 
+  animation: zoom .3s ease;
+}
+
+
+@keyframes zoom {
+  from { transform: scale(.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox .close {
+  position: absolute;
+  top: 25px;
+  right: 35px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+}
+
+.lightbox .arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  padding: 20px;
+}
+
+.lightbox .left { left: 30px; }
+.lightbox .right { right: 30px; }
+
+/* ===================== AUTH (LOGIN / REGISTER) ===================== */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #111, #1c1c1c);
+}
+
+.auth-box {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.auth-box h2 {
+  margin-bottom: 25px;
+  color: #b30000;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: 0.3s;
+}
+
+.auth-box input:focus {
+  border-color: #e10600;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(225,6,0,0.1);
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #e10600, #8f0000);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-box button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(225,6,0,0.4);
+}
+
+.auth-box a {
+  display: block;
+  margin-top: 15px;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.auth-box a:hover {
+  color: #e10600;
+}
+
+/* ===================== ADMIN PANEL ===================== */
+
+.admin-container {
+  padding: 100px 50px;
+}
+
+.admin-box {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.admin-box h2 {
+  color: #b30000;
+  margin-bottom: 20px;
+}
+
+.admin-users {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-users li {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-users li:last-child {
+  border-bottom: none;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #eee;
+  text-decoration: none;
+  color: #333;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #ddd;
+}

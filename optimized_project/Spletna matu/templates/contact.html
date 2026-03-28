@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <title>Luxury Cars | Kontakt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      margin-top: 50px;
+    }
+
+    .contact-info,
+    .contact-form,
+    .contact-history {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+      animation: fadeUp 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .contact-form { animation-delay: .2s; }
+    .contact-history { animation-delay: .3s; margin-top: 30px; }
+
+    @keyframes fadeUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    h1 { margin-bottom: 10px; }
+    h2 { color: #b30000; margin-bottom: 25px; }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    .info-row i {
+      font-size: 18px;
+      color: #b30000;
+      margin-right: 15px;
+      width: 24px;
+    }
+
+    .map {
+      margin-top: 25px;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      border: 1px solid #ddd;
+      font-size: 0.95rem;
+      transition: border .3s ease, box-shadow .3s ease;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: #b30000;
+      box-shadow: 0 0 0 3px rgba(179,0,0,0.15);
+    }
+
+    .contact-form textarea {
+      min-height: 220px;
+      resize: vertical;
+    }
+
+    .contact-form button {
+      background: linear-gradient(135deg, #b30000, #7a0000);
+      color: white;
+      border: none;
+      padding: 16px;
+      width: 100%;
+      border-radius: 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .contact-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(179,0,0,0.4);
+    }
+
+    .form-status {
+      margin-top: 18px;
+      font-weight: bold;
+      animation: fadeUp .5s ease;
+    }
+
+    .form-status.success {
+      color: green;
+    }
+
+    .form-status.error {
+      color: #b30000;
+    }
+
+    .contact-message-box {
+      background: #fafafa;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid #eee;
+    }
+
+    .contact-message-box p {
+      margin-bottom: 10px;
+    }
+
+    .admin-reply {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+    }
+
+    .waiting-reply {
+      color: #777;
+      font-style: italic;
+    }
+
+    @media (max-width: 900px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="logo">Luxury Cars</div>
+  <ul>
+    <li><a href="/">Domov</a></li>
+    <li><a href="/about">O nas</a></li>
+    <li><a href="/models">Modeli</a></li>
+    <li><a href="/gallery">Galerija</a></li>
+    {% if not user %}
+      <li><a href="/login">Prijava</a></li>
+      <li><a href="/register">Registracija</a></li>
+    {% else %}
+      <li class="user-info"><a href="/profile">Pozdravljen(a), <strong>{{ user }}</strong></a></li>
+      <li><a href="/logout">Odjava</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+<main class="section">
+  <h1>Kontakt</h1>
+  <p>Rezervirajte luksuzno vozilo ali nam pošljite povpraševanje.</p>
+
+  <div class="contact-grid">
+
+    <div class="contact-info">
+      <h2>Luxury Cars – Ace Avto</h2>
+
+      <div class="info-row">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>Gorenjska cesta 19, 1234 Mengeš</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fa-solid fa-phone"></i>
+        <span>+386 40 555 888</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fa-solid fa-envelope"></i>
+        <span>info@luxurycars.si</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fa-solid fa-clock"></i>
+        <span>
+          Pon–Pet: 9:00 – 18:00<br>
+          Sobota: 9:00 – 14:00<br>
+          Nedelja: zaprto
+        </span>
+      </div>
+
+      <div class="map">
+        <iframe
+          src="https://www.google.com/maps?q=Gorenjska%20cesta%2019%20Mengeš&output=embed"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h2>Pošljite sporočilo</h2>
+
+      <form id="contactForm" method="POST" action="/contact">
+        <input type="text" 
+              id="name" 
+              name="name" 
+              placeholder="Ime in priimek"
+              value="{{ user if user else '' }}"
+              required>
+
+        <input type="email" 
+              id="email" 
+              name="email" 
+              placeholder="Email naslov"
+              value="{{ user if user else '' }}"
+              {% if user %}readonly{% endif %}
+              required>
+        <textarea id="message" name="message" placeholder="Vaše sporočilo..." required></textarea>
+        <button type="submit">Pošlji sporočilo</button>
+
+        {% if success %}
+          <p class="form-status success">{{ success }}</p>
+        {% endif %}
+
+        {% if error %}
+          <p class="form-status error">{{ error }}</p>
+        {% endif %}
+      </form>
+    </div>
+
+  </div>
+
+  {% if user and user_messages %}
+    <div class="contact-history">
+      <h2>Vaša pretekla sporočila</h2>
+
+      {% for msg in user_messages %}
+        <div class="contact-message-box">
+          <p><strong>Ime:</strong> {{ msg.name }}</p>
+          <p><strong>Email:</strong> {{ msg.email }}</p>
+          <p><strong>Vaše sporočilo:</strong> {{ msg.message }}</p>
+
+          {% if msg.reply %}
+            <div class="admin-reply">
+              <p><strong>Odgovor admina:</strong></p>
+              <p>{{ msg.reply }}</p>
+            </div>
+          {% else %}
+            <div class="admin-reply">
+              <p class="waiting-reply">Odgovor še ni poslan.</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</main>
+
+</body>
+</html>
