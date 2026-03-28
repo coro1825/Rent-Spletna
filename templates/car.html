@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <title>Luxury Cars | Podrobnosti vozila</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    /* GALERIJA */
+    .car-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .car-gallery img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .3s ease;
+    }
+
+    .car-gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    /* LIGHTBOX */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+      z-index: 9999;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      animation: zoom .3s ease;
+    }
+
+    @keyframes zoom {
+      from { transform: scale(.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .lightbox .close {
+      position: absolute;
+      top: 25px;
+      right: 35px;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .lightbox .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 60px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      padding: 20px;
+    }
+
+    .lightbox .left { left: 30px; }
+    .lightbox .right { right: 30px; }
+  </style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="logo">Luxury Cars</div>
+  <ul>
+    <li><a href="/about">O nas</a></li>
+    <li><a href="/models">Modeli</a></li>
+    <li><a href="/contact">Kontakt</a></li>
+    <li><a href="/gallery">Galerija</a></li>
+    {% if not user %}
+      <li><a href="/login">Prijava</a></li>
+      <li><a href="/register">Registracija</a></li>
+    {% else %}
+      <li class="user-info"><a href="/profile">Pozdravljen(a), <strong>{{ user }}</strong></a></li>
+      <li><a href="/logout">Odjava</a></li>
+    {% endif %}
+
+  </ul>
+</nav>
+
+<main class="section car-detail">
+
+  <div class="car-detail-grid">
+
+    <!-- PODATKI AVTA -->
+    <div>
+      <div id="carGallery" class="car-gallery"></div>
+
+      <h1 id="carName"></h1>
+      <p id="carDesc"></p>
+
+      <ul>
+        <li>Hitrost: <strong><span id="carSpeed"></span> km/h</strong></li>
+        <li>0–100: <strong><span id="carZero"></span> s</strong></li>
+        <li>Motor: <strong><span id="carEngine"></span></strong></li>
+        <li>Menjalnik: <strong><span id="carTransmission"></span></strong></li>
+        <li>Cena: <strong>€<span id="carPrice"></span> / dan</strong></li>
+      </ul>
+
+      <h3>Dodatki</h3>
+      <ul id="carExtras"></ul>
+    </div>
+
+    <!-- REZERVACIJA-->
+   <div class="reservation-box">
+      <h3>Rezervacija</h3>
+
+      <form id="reservationForm" method="POST" action="/reserve">
+        <input type="hidden" name="car" id="carInput">
+        <input type="hidden" name="price_per_day" id="pricePerDay" value="">
+        <input type="hidden" name="car_folder" id="carFolderInput">
+
+        <label>Od:</label>
+        <input type="date" id="dateFrom" name="from" required>
+
+        <label>Do:</label>
+        <input type="date" id="dateTo" name="to" required>
+
+        <label>Mesto prevzema:</label>
+        <select name="city" required>
+          <option value="">Izberi mesto</option>
+          <option value="Ljubljana">Ljubljana</option>
+          <option value="Maribor">Maribor</option>
+          <option value="Celje">Celje</option>
+          <option value="Koper">Koper</option>
+          <option value="Novo mesto">Novo mesto</option>
+        </select>
+
+        <p id="totalPrice"></p>
+
+        <button type="submit" class="btn">Rezerviraj</button>
+      </form>
+
+      <p id="formStatus"></p>
+    </div>
+
+  </div>
+</main>
+
+
+<script>
+/* ================= AVTI ================= */
+const cars = [
+  {
+    folder: "ferrari-f8-tributo",
+    name: "Ferrari F8 Tributo",
+    brand: "Ferrari",
+    speed: 340,
+    zero: 2.9,
+    price: 280,
+    engine: "V8 3.9L Twin-Turbo",
+    transmission: "7-stopenjski avtomatski",
+    desc: "Ferrari F8 Tributo predstavlja popolno ravnovesje med brutalno močjo in elegantno italijansko obliko.",
+    extras: [
+      "Karbon-keramične zavore",
+      "Usnjena notranjost",
+      "Aktivna aerodinamika",
+      "Digitalni kokpit"
+    ]
+  },
+  {
+    folder: "lamborghini-huracan-tecnica",
+    name: "Lamborghini Huracan Tecnica",
+    brand: "Lamborghini",
+    speed: 325,
+    zeroTo100: 3.2,
+    price: 320,
+    engine: "V10 5.2L atmosferik",
+    transmission: "7-stopenjski DCT",
+    desc: "Huracan Tecnica združuje neverjetno zmogljivost in vsakodnevno uporabo v enem športnem paketu.",
+    extras: [
+      "Napredna aerodinamika",
+      "Carbon keramične zavore",
+      "Sport sedeži",
+      "Visokozmogljiv izpuh"
+    ]
+  },
+  {
+    folder: "porsche-911-turbo-s-brabus",
+    name: "Porsche 911 Turbo S Brabus",
+    brand: "Porsche",
+    speed: 330,
+    zeroTo100: 2.7,
+    price: 350,
+    engine: "Twin Turbo 3.8L Boxer",
+    transmission: "8-stopenjski PDK",
+    desc: "Porsche 911 Turbo S Brabus je prefinjena kombinacija zmogljivosti in luksuza z edinstveno predelavo.",
+    extras: [
+      "Brabus paket",
+      "Štirikolesni pogon",
+      "Sport Chrono",
+      "Performance izpušni sistem"
+    ]
+  },
+  {
+    folder: "ferrari-812-gts-spyder-novitec",
+    name: "Ferrari 812 GTS Spyder Novitec",
+    brand: "Ferrari",
+    speed: 340,
+    zeroTo100: 3.0,
+    price: 420,
+    engine: "V12 6.5L",
+    transmission: "7-stopenjski DCT",
+    desc: "Ferrari 812 GTS Novitec prinaša odprto dinamično vožnjo s kultnim V12 motorjem in elegantno obliko.",
+    extras: [
+      "Novitec tuning",
+      "Premium usnje",
+      "Aktivni aerodinamični paket",
+      "Carbon dodatki"
+    ]
+  },
+  {
+    folder: "audi-r8-spyder",
+    name: "Audi R8 Spyder",
+    brand: "Audi",
+    speed: 329,
+    zeroTo100: 3.2,
+    price: 300,
+    engine: "V10 5.2L",
+    transmission: "7-stopenjski S tronic",
+    desc: "Audi R8 Spyder ponuja odprto vozno izkušnjo z impresivno močjo in perfektnim uravnoteženjem.",
+    extras: [
+      "Quattro pogon",
+      "LED Matrix žarometi",
+      "Virtual Cockpit",
+      "Sportni paket"
+    ]
+  },
+  {
+    folder: "audi-rs7",
+    name: "Audi RS7",
+    brand: "Audi",
+    speed: 305,
+    zeroTo100: 3.5,
+    price: 270,
+    engine: "V8 4.0L Twin Turbo",
+    transmission: "8-stopenjski tiptronic",
+    desc: "Audi RS7 je dinamičen športni avtomobil z elegantnim dizajnom in izjemno zmogljivostjo.",
+    extras: [
+      "Sport paket",
+      "Dynamic Ride Control",
+      "Bang & Olufsen zvok",
+      "RS keramika"
+    ]
+  },
+  {
+    folder: "audi-rs6",
+    name: "Audi RS6",
+    brand: "Audi",
+    speed: 305,
+    zeroTo100: 3.6,
+    price: 260,
+    engine: "V8 4.0L Twin Turbo",
+    transmission: "8-stopenjski tiptronic",
+    desc: "Audi RS6 je vsestranski performance karavan z brutalno močjo in prostornostjo.",
+    extras: [
+      "Quattro permanentni pogon",
+      "RS Adaptive zavorni sistem",
+      "Sportni izpušni sistem",
+      "Premium notranjost"
+    ]
+  },
+  {
+    folder: "bmw-m5-competition-g90",
+    name: "BMW M5 Competition G90",
+    brand: "BMW",
+    speed: 305,
+    zeroTo100: 3.3,
+    price: 280,
+    engine: "V8 4.4L Twin Turbo",
+    transmission: "8-stopenjski Steptronic",
+    desc: "BMW M5 Competition G90 združuje moč, natančnost in vsakodnevno udobje v enem izjemnem športnem avtomobilu.",
+    extras: [
+      "M Dynamic Mode",
+      "Active M diferencijal",
+      "Karbon dodatki",
+      "M sport zavore"
+    ]
+  },
+  {
+    folder: "bmw-m4-competition-convertible",
+    name: "BMW M4 Competition Convertible",
+    brand: "BMW",
+    speed: 290,
+    zeroTo100: 3.8,
+    price: 260,
+    engine: "B58 3.0L Twin Turbo",
+    transmission: "8-stopenjski Steptronic",
+    desc: "BMW M4 Competition Convertible ponuja športno dinamiko in užitek odprte vožnje.",
+    extras: [
+      "Soft-top streha",
+      "Adaptive M suspenzija",
+      "M sport paket",
+      "Sport sedeži"
+    ]
+  },
+  {
+    folder: "bmw-x6m-competition",
+    name: "BMW X6M Competition",
+    brand: "BMW",
+    speed: 290,
+    zeroTo100: 3.9,
+    price: 275,
+    engine: "V8 4.4L Twin Turbo",
+    transmission: "8-stopenjski Steptronic",
+    desc: "BMW X6M Competition združuje SUV udobje z vrhunsko zmogljivostjo športnega vozila.",
+    extras: [
+      "M sport paket",
+      "Adaptive X suspenzija",
+      "High performance zavorni sistem",
+      "Panoramska streha"
+    ]
+  },
+  {
+    folder: "bmw-x7m-m50i-competition",
+    name: "BMW X7 M50i Competition",
+    brand: "BMW",
+    speed: 250,
+    zeroTo100: 5.5,
+    price: 290,
+    engine: "V8 4.4L Twin Turbo",
+    transmission: "8-stopenjski Steptronic",
+    desc: "BMW X7 M50i Competition je luksuzen SUV z impresivno zmogljivostjo in prostorom za celotno družino.",
+    extras: [
+      "7-sedežev notranjost",
+      "Adaptive suspenzija",
+      "Panoramska streha",
+      "Premium surround zvok"
+    ]
+  },
+  {
+    folder: "bentley-continental-gt",
+    name: "Bentley Continental GT",
+    brand: "Bentley",
+    speed: 333,
+    zeroTo100: 3.6,
+    price: 450,
+    engine: "W12 6.0L Twin Turbo",
+    transmission: "8-stopenjski avtomatski",
+    desc: "Bentley Continental GT je vrhunski gran turismo z izjemno kombinacijo elegance in moči.",
+    extras: [
+      "Luksuzna notranjost",
+      "High-end audio sistem",
+      "Air ride suspenzija",
+      "Premium paket"
+    ]
+  },
+  {
+    folder: "lamborghini-revuelto-novitec",
+    name: "Lamborghini Revuelto Novitec",
+    brand: "Lamborghini",
+    speed: 340,
+    zeroTo100: 2.5,
+    price: 500,
+    engine: "V12 Hybrid 6.5L",
+    transmission: "8-stopenjski DCT",
+    desc: "Lamborghini Revuelto Novitec je najnovejši superšportnik z izjemno zmogljivostjo in hibridno učinkovitostjo.",
+    extras: [
+      "Novitec performance tuning",
+      "Carbon aero paket",
+      "Premium usnje",
+      "Napredni infotainment"
+    ]
+  },
+  {
+    folder: "lamborghini-urus-performante",
+    name: "Lamborghini Urus Performante",
+    brand: "Lamborghini",
+    speed: 305,
+    zeroTo100: 3.6,
+    price: 350,
+    engine: "V8 4.0L Twin Turbo",
+    transmission: "8-stopenjski DCT",
+    desc: "Lamborghini Urus Performante združuje SUV udobje in superšportno zmogljivost.",
+    extras: [
+      "Torque vectoring",
+      "Active aerodynamics",
+      "Carbon keramične zavore",
+      "Sport Plus paket"
+    ]
+  },
+  {
+    folder: "mercedes-g63-800-widestar-brabus",
+    name: "Mercedes Benz G63 800 Widestar Brabus",
+    brand: "Mercedes Benz",
+    speed: 240,
+    zeroTo100: 4.8,
+    price: 380,
+    engine: "V8 4.0L Twin Turbo",
+    transmission: "9-stopenjski avtomatski",
+    desc: "Mercedes Benz G63 800 Widestar Brabus prinaša brutalno moč in agresiven izgled po meri.",
+    extras: [
+      "Brabus tuning",
+      "Wide body kit",
+      "Premium usnje",
+      "Off-road zmogljivosti"
+    ]
+  },
+  {
+    folder: "mercedes-g63-brabus-rocket-900",
+    name: "Mercedes Benz G63 Brabus Rocket 900",
+    brand: "Mercedes Benz",
+    speed: 250,
+    zeroTo100: 4.5,
+    price: 400,
+    engine: "V8 4.0L Twin Turbo",
+    transmission: "9-stopenjski avtomatski",
+    desc: "Mercedes Benz G63 Brabus Rocket 900 je izjemno zmogljiv terenec z impresivnimi specifikacijami.",
+    extras: [
+      "Rocket 900 paket",
+      "Performance tuning",
+      "Premium notranjost",
+      "Off-road elektronika"
+    ]
+  },
+  {
+    folder: "rolls-royce-cullinan",
+    name: "Rolls Royce Cullinan",
+    brand: "Rolls Royce",
+    speed: 250,
+    zeroTo100: 5.2,
+    price: 600,
+    engine: "V12 6.75L",
+    transmission: "8-stopenjski avtomatski",
+    desc: "Rolls Royce Cullinan je vrhunec luksuza med SUV vozili, zasnovan za udobje in eleganco.",
+    extras: [
+      "Ročno izdelana notranjost",
+      "Zračno vzmetenje",
+      "Premium zvok",
+      "Napredni asistenčni sistemi"
+    ]
+  }
+];
+
+/* ================= NALAGANJE PODATKOV AVTA ================= */
+const params = new URLSearchParams(window.location.search);
+const car = cars.find(c => c.name === params.get("car"));
+
+if (!car) {
+  document.body.innerHTML = "<h2 style='padding:40px'>Avto ni najden.</h2>";
+  throw new Error("Car not found");
+}
+
+document.getElementById("carName").textContent = car.name;
+document.getElementById("carDesc").textContent = car.desc;
+document.getElementById("carSpeed").textContent = car.speed;
+document.getElementById("carZero").textContent = car.zeroTo100 ?? car.zero;
+document.getElementById("carPrice").textContent = car.price;
+document.getElementById("carEngine").textContent = car.engine;
+document.getElementById("carTransmission").textContent = car.transmission;
+
+/* hidden inputi za rezervacijo */
+document.getElementById("carInput").value = car.name;
+document.getElementById("pricePerDay").value = car.price;
+document.getElementById("carFolderInput").value = car.folder;
+
+/* ================= DODATKI ================= */
+const extras = document.getElementById("carExtras");
+car.extras.forEach(extra => {
+  const li = document.createElement("li");
+  li.textContent = extra;
+  extras.appendChild(li);
+});
+
+/* ================= GALERIJA + LIGHTBOX ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const gallery = document.getElementById("carGallery");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const closeBtn = document.getElementById("closeLightbox");
+  const prevArrow = document.getElementById("prevArrow");
+  const nextArrow = document.getElementById("nextArrow");
+
+  let images = [];
+  let currentIndex = 0;
+
+  for (let i = 1; i <= 20; i++) {
+    const src = `/static/slike/${car.folder}/${i}.jpg`;
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = car.name;
+    img.onerror = () => img.remove();
+
+    gallery.appendChild(img);
+    images.push(src);
+
+    img.addEventListener("click", () => {
+      currentIndex = images.indexOf(src);
+      lightboxImg.src = images[currentIndex];
+      lightbox.classList.add("active");
+      updateArrows();
+    });
+  }
+
+  function updateArrows() {
+    prevArrow.style.display = currentIndex === 0 ? "none" : "block";
+    nextArrow.style.display = currentIndex === images.length - 1 ? "none" : "block";
+  }
+
+  function nextImage() {
+    if (currentIndex < images.length - 1) {
+      currentIndex++;
+      lightboxImg.src = images[currentIndex];
+      updateArrows();
+    }
+  }
+
+  function prevImage() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      lightboxImg.src = images[currentIndex];
+      updateArrows();
+    }
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("active");
+  }
+
+  nextArrow.addEventListener("click", nextImage);
+  prevArrow.addEventListener("click", prevImage);
+  closeBtn.addEventListener("click", closeLightbox);
+
+  document.addEventListener("keydown", e => {
+    if (!lightbox.classList.contains("active")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") nextImage();
+    if (e.key === "ArrowLeft") prevImage();
+  });
+
+  lightbox.addEventListener("click", e => {
+    if (e.target === lightbox) closeLightbox();
+  });
+});
+
+/* ================= IZRAČUN CENE ================= */
+const dateFromInput = document.getElementById("dateFrom");
+const dateToInput = document.getElementById("dateTo");
+const totalPriceEl = document.getElementById("totalPrice");
+const pricePerDayInput = document.getElementById("pricePerDay");
+
+function calculatePrice() {
+  if (!dateFromInput.value || !dateToInput.value) {
+    totalPriceEl.textContent = "";
+    pricePerDayInput.value = car.price;
+    return;
+  }
+
+  const from = new Date(dateFromInput.value);
+  const to = new Date(dateToInput.value);
+
+  const days = Math.round((to - from) / (1000 * 60 * 60 * 24)) + 1;
+
+  if (days > 0) {
+    const total = days * car.price;
+    totalPriceEl.textContent = `Cena: ${total}€ (${days} dni)`;
+    pricePerDayInput.value = car.price;
+    document.getElementById("formStatus").textContent = "";
+  } else {
+    totalPriceEl.textContent = "Nepravilen datum!";
+    pricePerDayInput.value = car.price;
+  }
+}
+
+dateFromInput.addEventListener("change", calculatePrice);
+dateToInput.addEventListener("change", calculatePrice);
+
+/* ================= VALIDACIJA PRED ODDAJO ================= */
+document.getElementById("reservationForm").addEventListener("submit", e => {
+  const from = new Date(dateFromInput.value);
+  const to = new Date(dateToInput.value);
+
+  if (!dateFromInput.value || !dateToInput.value) {
+    e.preventDefault();
+    document.getElementById("formStatus").textContent = "Izberi oba datuma.";
+    return;
+  }
+
+  const days = Math.round((to - from) / (1000 * 60 * 60 * 24)) + 1;
+
+  if (days <= 0) {
+    e.preventDefault();
+    document.getElementById("formStatus").textContent = "Nepravilen datum!";
+  }
+
+
+});
+</script>
+
+<div id="lightbox" class="lightbox">
+  <span class="close" id="closeLightbox">&times;</span>
+  <span class="arrow left" id="prevArrow">&#10094;</span>
+  <img id="lightboxImg" src="">
+  <span class="arrow right" id="nextArrow">&#10095;</span>
+</div>
+
+</body>
+</html>
